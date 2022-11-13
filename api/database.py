@@ -7,13 +7,9 @@ from sqlalchemy.orm import sessionmaker
 DB_USER = os.getenv("POSTGRES_USER")
 DB_PASS = os.getenv("POSTGRES_PASSWORD")
 DB_NAME = os.getenv("POSTGRES_DB")
+DB_CONNECTION_STRING = f"postgresql://{DB_USER}:{DB_PASS}@app_db:5432/{DB_NAME}"
+
 BASE = declarative_base()
-
-
-db_string = f"postgresql://{DB_USER}:{DB_PASS}@app_db:5432/{DB_NAME}"
-db = create_engine(db_string)
-Session = sessionmaker(db)
-session = Session()
 
 
 class VoucherSegmentation(BASE):
@@ -23,3 +19,9 @@ class VoucherSegmentation(BASE):
     segment_name = Column(String)
     segment_type = Column(String)
     voucher_amount = Column(Integer)
+
+
+db = create_engine(DB_CONNECTION_STRING)
+Session = sessionmaker(db)
+session = Session()
+BASE.metadata.create_all(db)
