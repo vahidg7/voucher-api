@@ -3,12 +3,7 @@ import os
 
 from airflow.operators.python_operator import PythonOperator
 from airflow.providers.postgres.operators.postgres import PostgresOperator
-from etl_utils import (
-    clean_directory,
-    convert_to_csv,
-    download_data,
-    send_csv_to_db,
-)
+from etl_utils import clean_directory, convert_to_csv, download_data, send_csv_to_db
 
 from airflow import DAG
 
@@ -20,6 +15,7 @@ DATA_PATH = "/opt/airflow/data"
 DATA_FILE_NAME = "voucher"
 PARQUET_FILE_PATH = os.path.join(DATA_PATH, f"{DATA_FILE_NAME}.parquet.gzip")
 CSV_FILE_PATH = os.path.join(DATA_PATH, f"{DATA_FILE_NAME}.csv")
+TODAY_DATE = os.getenv("TODAY")
 
 
 with DAG(
@@ -62,6 +58,7 @@ with DAG(
         task_id="calculate_segmentation",
         postgres_conn_id=POSTGRES_CONN_ID,
         sql="sql/segmentation.sql",
+        parameters={"today": TODAY_DATE},
     )
 
     extract_task >> transform_task >> load_task >> calculate_segmentation

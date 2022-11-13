@@ -22,7 +22,7 @@ CREATE TABLE IF NOT EXISTS voucher_segmentation AS (
         SELECT
             voucher_amount,
             total_orders,
-            ('2020-06-01'::DATE - last_order_ts::DATE) AS recency_days
+            (%(today)s::DATE - last_order_ts::DATE) AS recency_days
         FROM valid_data WHERE valid
     ),
 
@@ -41,7 +41,7 @@ CREATE TABLE IF NOT EXISTS voucher_segmentation AS (
                 WHEN recency_days BETWEEN 61 AND 90 THEN '61-90'
                 WHEN recency_days BETWEEN 91 AND 120 THEN '91-120'
                 WHEN recency_days BETWEEN 121 AND 180 THEN '121-180'
-                WHEN recency_days > 180 THEN '180'
+                WHEN recency_days > 180 THEN '180+'
             END AS quantized_recency
         FROM featured_data
     ),
@@ -66,8 +66,8 @@ CREATE TABLE IF NOT EXISTS voucher_segmentation AS (
     frequency_segments AS (
         SELECT
             voucher_amount,
-            quantized_frequency AS segment_name,
-            'frequent_segment' AS segment_type
+            quantized_frequency AS segment_type,
+            'frequent_segment' AS segment_name
         FROM top_frequency_counts where rank=1
     ),
 
@@ -91,13 +91,20 @@ CREATE TABLE IF NOT EXISTS voucher_segmentation AS (
     recency_segments AS (
         SELECT
             voucher_amount,
-            quantized_recency AS segment_name,
-            'recency_segment' AS segment_type
+            quantized_recency AS segment_type,
+            'recency_segment' AS segment_name
         FROM top_recency_counts where rank=1
+    ),
+
+    unioned_segments AS (
+        SELECT * FROM recency_segments
+        UNION ALL
+        SELECT * FROM frequency_segments
     )
 
-
-SELECT * FROM recency_segments
-UNION ALL
-SELECT * FROM frequency_segments
+SELECT row_number() OVER (ORDER BY segment_type, segment_name, voucher_amount) AS id,
+    segment_type,
+    segment_name,
+    voucher_amount
+FROM unioned_segments
 );

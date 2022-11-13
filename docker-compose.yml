@@ -7,10 +7,10 @@ x-airflow-common:
   env_file:
     - .env.airflow
   volumes:
-    - ./dags:/opt/airflow/dags
-    - ./logs:/opt/airflow/logs
-    - ./plugins:/opt/airflow/plugins
-    - ./data:/opt/airflow/data
+    - ./airflow/dags:/opt/airflow/dags
+    - ./airflow/logs:/opt/airflow/logs
+    - ./airflow/plugins:/opt/airflow/plugins
+    - ./airflow/data:/opt/airflow/data
     - /var/run/docker.sock:/var/run/docker.sock
 
 x-airflow-common-depends-on:
