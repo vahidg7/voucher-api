@@ -3,7 +3,8 @@ import os
 
 from airflow.operators.python_operator import PythonOperator
 from airflow.providers.postgres.operators.postgres import PostgresOperator
-from etl_utils import clean_directory, convert_to_csv, download_data, send_csv_to_db
+from etl_utils import (clean_directory, convert_to_csv, download_data,
+                       send_csv_to_db)
 
 from airflow import DAG
 
