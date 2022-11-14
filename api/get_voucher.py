@@ -1,6 +1,6 @@
 from typing import Optional
 
-from database import VoucherSegmentation, session
+from database import db, voucher_segmentation_table
 
 
 def get_voucher_value(
@@ -38,13 +38,16 @@ def get_voucher_value(
     else:
         return None
 
-    voucher_amount = (
-        session.query(VoucherSegmentation.voucher_amount)
-        .filter(
-            VoucherSegmentation.segment_name == segment_name,
-            VoucherSegmentation.segment_type == segment_type,
+    with db.connect() as conn:
+        select_statement = (
+            voucher_segmentation_table.select()
+            .where(
+                voucher_segmentation_table.c.segment_name == segment_name,
+                voucher_segmentation_table.c.segment_type == segment_type,
+            )
+            .limit(1)
         )
-        .scalar()
-    )
+        result_set = conn.execute(select_statement)
+    voucher_amount = [item.voucher_amount for item in result_set]
 
-    return voucher_amount
+    return voucher_amount[0] if len(voucher_amount) > 0 else None
