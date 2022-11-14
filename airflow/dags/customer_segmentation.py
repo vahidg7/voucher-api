@@ -4,6 +4,8 @@ import os
 from airflow.operators.python_operator import PythonOperator
 from airflow.providers.postgres.operators.postgres import PostgresOperator
 from etl_utils import clean_directory, convert_to_csv, download_data, send_csv_to_db
+from airflow.models.baseoperator import chain
+
 
 from airflow import DAG
 
@@ -26,6 +28,7 @@ with DAG(
     catchup=False,
 ) as dag:
 
+    # clean data directory to download new data
     clean_task = PythonOperator(
         task_id="clean_task",
         dag=dag,
@@ -33,6 +36,7 @@ with DAG(
         op_args=[DATA_PATH],
     )
 
+    # download data and place it in data directory
     extract_task = PythonOperator(
         task_id="extract_task",
         dag=dag,
@@ -40,6 +44,7 @@ with DAG(
         op_args=[DOWNLOAD_URL, PARQUET_FILE_PATH],
     )
 
+    # read parquet file and convert it to CSV and store it in data directory
     transform_task = PythonOperator(
         task_id="transform_task",
         dag=dag,
@@ -47,6 +52,7 @@ with DAG(
         op_args=[PARQUET_FILE_PATH, CSV_FILE_PATH],
     )
 
+    # load the CSV file to a database table
     load_task = PythonOperator(
         task_id="load_task",
         dag=dag,
@@ -54,6 +60,7 @@ with DAG(
         op_args=[POSTGRES_CONN_ID, CSV_FILE_PATH],
     )
 
+    # run the sql query to calculate the customer segments
     calculate_segmentation = PostgresOperator(
         task_id="calculate_segmentation",
         postgres_conn_id=POSTGRES_CONN_ID,
@@ -61,4 +68,4 @@ with DAG(
         parameters={"today": TODAY_DATE},
     )
 
-    extract_task >> transform_task >> load_task >> calculate_segmentation
+    chain(extract_task, transform_task, load_task, calculate_segmentation)

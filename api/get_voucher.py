@@ -38,6 +38,7 @@ def get_voucher_value(
     else:
         return None
 
+    # find database for the related voucher amount
     with db.connect() as conn:
         select_statement = (
             voucher_segmentation_table.select()
@@ -50,4 +51,5 @@ def get_voucher_value(
         result_set = conn.execute(select_statement)
     voucher_amount = [item.voucher_amount for item in result_set]
 
+    # if no related record is found in database, return None
     return voucher_amount[0] if len(voucher_amount) > 0 else None

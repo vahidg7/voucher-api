@@ -1,3 +1,5 @@
+-- initialize and create the voucher history table
+
 DROP TABLE IF EXISTS voucher_history;
 
 CREATE TABLE IF NOT EXISTS voucher_history (

@@ -30,6 +30,7 @@ async def create_item(customer: Customer):
     endpoint to get voucher amount for a customer
     """
 
+    # get related query parameters
     segment_name = customer.segment_name
     total_orders = customer.total_orders
     date_diff_days = (TODAY_DATE - customer.last_order_ts).days
