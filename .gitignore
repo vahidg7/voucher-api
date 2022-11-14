@@ -1,5 +1,4 @@
 *.idea
 *.pyc
 *.pdf
-.env.*
 __pycache__
