@@ -2,9 +2,8 @@ import os
 from datetime import datetime
 
 from fastapi import FastAPI, HTTPException
-from pydantic import BaseModel
-
 from get_voucher import get_voucher_value
+from pydantic import BaseModel
 
 TODAY_DATE = datetime.strptime(os.getenv("TODAY"), "%Y-%m-%d")
 
