@@ -9,7 +9,7 @@ RUN pip install 'pipenv==2022.11.11'
 
 COPY ./Pipfile  /Pipfile
 COPY ./Pipfile.lock  /Pipfile.lock
-RUN pipenv install --system --ignore-pipfile --deploy
+RUN pipenv install --system --ignore-pipfile --dev
 
 ### Final image
 FROM python:3.8.13-slim-buster
