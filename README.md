@@ -85,8 +85,17 @@ response = requests.post(url, json=cusromer_object)
 print(response.text)
 ```
 
+## tests
+This project uses the pytest framework for unit testing.
+some API tests are provided using pytest to test if API calls are working fine. To run tests, we need to exec into the api container and run pytest.
+```
+docker exec -it app-api bash
+$ pytest
+```
+NOTE: these unit tests use the same database which is used by the main app. So after running pytest, previous results will be deleted from the database and the pipeline must run again.
+It can be improved by providing another database for testing.
 
 ## TODO:
-- add type hints
+- add more tests and use separate database for unit tests
 - add CI
-- add more tests
+- add type hints and pre-commit checks
