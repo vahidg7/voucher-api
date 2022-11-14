@@ -11,6 +11,7 @@ DB_CONNECTION_STRING = f"postgresql://{DB_USER}:{DB_PASS}@app_db:5432/{DB_NAME}"
 db = create_engine(DB_CONNECTION_STRING)
 meta = MetaData(db)
 
+# define segmentation result table for sqlalchemy
 voucher_segmentation_table = Table(
     "voucher_segmentation",
     meta,
@@ -20,5 +21,6 @@ voucher_segmentation_table = Table(
     Column("voucher_amount", Integer),
 )
 
+# create segmentation result if not exists
 if not voucher_segmentation_table.exists():
     voucher_segmentation_table.create()
